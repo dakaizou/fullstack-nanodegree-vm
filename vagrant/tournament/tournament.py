@@ -5,7 +5,7 @@
 
 import psycopg2
 
-
+database = 'dbname=tournament'
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
     return psycopg2.connect("dbname=tournament")
@@ -13,14 +13,24 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
+    with psycopg2.connect(database) as conn:
+        with conn.cursor() as c:
+            c.execute('DELETE FROM matches')
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    with psycopg2.connect(database) as conn:
+        with conn.cursor() as c:
+            c.execute('DELETE FROM players')
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    with psycopg2.connect(database) as conn:
+        with conn.cursor() as c:
+            c.execute('SELECT COUNT(id) FROM players')
+            return int(c.fetchone()[0])
 
 
 def registerPlayer(name):
@@ -32,6 +42,9 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    with psycopg2.connect(database) as conn:
+        with conn.cursor() as c:
+            c.execute('INSERT INTO players (name) VALUES (%s)', (name, ))
 
 
 def playerStandings():
@@ -47,6 +60,10 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    with psycopg2.connect(database) as conn:
+        with conn.cursor() as c:
+            c.execute('SELECT * FROM standing')
+            return c.fetchall()
 
 
 def reportMatch(winner, loser):
@@ -56,6 +73,11 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    with psycopg2.connect(database) as conn:
+        with conn.cursor() as c:
+            # c.execute('INSERT INTO matches (player1_id, player2_id, winner_id) SELECT x.id, y.id, x.id FROM players AS x, players AS y WHERE x.name = %s AND y.name = %s', (winner, loser))
+            c.execute('INSERT INTO matches (player1_id, player2_id, winner_id) VALUES (%s, %s, %s)', (winner, loser, winner))
+            # c.execute('INSERT INTO matches (winner_id, loser_id) VALUES (%s, %s)', (winner, loser))
  
  
 def swissPairings():
@@ -73,5 +95,17 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    standings = playerStandings()
+    pairs = []
+    match = []
+    for i in range(len(standings)):
+        match.append(standings[i][0])
+        match.append(standings[i][1])
+        if i % 2 == 1:
+            pairs.append(match)
+            match = []
+            continue
+    return pairs
+
 
 
