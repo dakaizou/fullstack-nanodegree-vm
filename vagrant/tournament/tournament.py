@@ -76,8 +76,7 @@ def reportMatch(winner, loser):
     with psycopg2.connect(database) as conn:
         with conn.cursor() as c:
             # c.execute('INSERT INTO matches (player1_id, player2_id, winner_id) SELECT x.id, y.id, x.id FROM players AS x, players AS y WHERE x.name = %s AND y.name = %s', (winner, loser))
-            c.execute('INSERT INTO matches (player1_id, player2_id, winner_id) VALUES (%s, %s, %s)', (winner, loser, winner))
-            # c.execute('INSERT INTO matches (winner_id, loser_id) VALUES (%s, %s)', (winner, loser))
+            c.execute('INSERT INTO matches (winner_id, loser_id) VALUES (%s, %s)', (winner, loser))
  
  
 def swissPairings():
