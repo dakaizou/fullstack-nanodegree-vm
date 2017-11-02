@@ -17,14 +17,14 @@ def deleteMatches():
     """Remove all the match records from the database."""
     with psycopg2.connect(database) as conn:
         with conn.cursor() as c:
-            c.execute('DELETE FROM matches')
+            c.execute('TRUNCATE matches CASCADE')
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
     with psycopg2.connect(database) as conn:
         with conn.cursor() as c:
-            c.execute('DELETE FROM players')
+            c.execute('TRUNCATE players')
 
 
 def countPlayers():
