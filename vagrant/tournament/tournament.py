@@ -10,7 +10,12 @@ database = 'dbname=tournament'
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+    try:
+        conn = psycopg2.connect(database)
+        c = conn.cursor()
+        return conn, c
+    except Exception as e:
+        print(e.message)
 
 
 def deleteMatches():
